@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $database = shift @ARGV;
+
+sub dscl_read {
+    my ($path, $key) = @_;
+    my $output = `dscl -q . -read $path $key 2>/dev/null`;
+    if ($? != 0) {
+	exit(2);
+    }
+    $output =~ s/^\w+:\s*(.*)\s*$/$1/m;
+    return $output;
+}
+
+# name:password:uid:gid:gecos:home_dir:shell
+sub getent_passwd {
+    my $key = shift;
+    my $path = "/Users/$key";
+
+    print join(':', ($key,
+		     'x',
+		     dscl_read($path, 'UniqueID'),
+		     dscl_read($path, 'PrimaryGroupID'),
+		     dscl_read($path, 'RealName'),
+		     dscl_read($path, 'UserShell'))),
+    "\n";
+
+    return;
+}
+
+# name:password:gid:members
+sub getent_group {
+    my $key = shift;
+    my $path = "/Groups/$key";
+
+    print join(':', ($key,
+		     'x',
+		     dscl_read($path, 'PrimaryGroupID'),
+		     '')),
+    "\n";
+
+    return;
+}
+
+if (scalar(@ARGV) == 0) {
+    exit 3;
+}
+
+foreach my $key (@ARGV) {
+    if ($database eq 'passwd') {
+	getent_passwd $key;
+    } elsif ($database eq 'group') {
+	getent_group $key;
+    } else {
+	print STDERR "Unknown database: $database\n";
+	exit 1;
+    }
+}

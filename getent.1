@@ -1,0 +1,27 @@
+.TH GETENT 1 2012-10-15 "" ""
+.SH NAME
+getent \- get entries from system databases
+.SH SYNOPSIS
+.B getent
+.IR database " [" key " ...]"
+.SH DESCRIPTION
+\fBgetent\fR shows entries from system databases.  This implementation
+only supports \fBpasswd\fR and \fBgroup\fR.  If a \fIkey\fR is given,
+only the selected entries are shown.  Otherwise all entries in the
+database are shown.
+.SH "EXIT STATUS"
+.TP 10
+0
+successful
+.TP
+1
+unknown or unsupported \fIdatabase\fR
+.TP
+2
+key not found in database
+.TP
+3
+enumeration not supported in database
+.RE
+.SH "SEE ALSO"
+.BR dscl (1)

@@ -1,0 +1,1 @@
+This is an emulation of the GNU libc program `getent`.  It's occasionally useful for porting scripts from GNU/Linux to Mac OS X. But note that this implementation does not support nearly all the database types that the GNU implementation supports.

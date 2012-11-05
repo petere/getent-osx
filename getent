@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Socket qw(inet_ntop);
+
 my $database = shift @ARGV;
 
 sub dscl_read {
@@ -45,6 +47,21 @@ sub getent_group {
     return;
 }
 
+sub getent_hosts {
+    my $key = shift;
+
+    my ($name, $aliases, $addrtype, $length, @addrs) = gethostbyname($key);
+    if (!$name) {
+	exit 2;
+    }
+    foreach my $addr (@addrs) {
+	my $a = inet_ntop($addrtype, $addr);
+	printf "%-15s %s", $a, $name;
+	print " $aliases" if $aliases;
+	print "\n";
+    }
+}
+
 if (scalar(@ARGV) == 0) {
     exit 3;
 }
@@ -54,6 +71,8 @@ foreach my $key (@ARGV) {
 	getent_passwd $key;
     } elsif ($database eq 'group') {
 	getent_group $key;
+    } elsif ($database eq 'hosts') {
+	getent_hosts $key;
     } else {
 	print STDERR "Unknown database: $database\n";
 	exit 1;
